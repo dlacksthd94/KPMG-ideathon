@@ -1,0 +1,7 @@
+pororo
+spacy
+streamlit
+pandas
+bs4
+lxml
+html_table_parser
