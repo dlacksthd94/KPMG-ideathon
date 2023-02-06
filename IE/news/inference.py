@@ -1,14 +1,38 @@
 from models import MyFastPororo
+import os
+import json
+from tqdm import tqdm
+import pickle
+import joblib as jl
+import torch
+import argparse
+PATH_ROOT = '/home/cslim/KPMG/data/news'
 
-# prepare model
+parser = argparse.ArgumentParser()
+parser.add_argument("-s", "--start_idx", default=0, type=int, required=False)
+parser.add_argument("-e", "--end_idx", default=50000, type=int, required=False)
+parser.add_argument("-g", "--gpu-id", default=0, type=int, required=False)
+args = parser.parse_args()
+
+### prepare model
 ner = MyFastPororo()
 ner.load_model()
+device = f'cuda:{args.gpu_id}' if torch.cuda.is_available() else 'cpu'
+ner.model.to(device)
+print('model loaded')
 
-# inference
-text = '삼정 KPMG에서 주최하는 아이디어톤에 서울대 데이터사이언스대학원 (GSDS) 의 박건도, 서아름, 손성욱, 임찬송, 최유림, 허상우 학생이 참여하였습니다.'
+with open(os.path.join(PATH_ROOT, 'news_2020_2021_batch.pickle'), 'rb') as f:
+    data_loader = pickle.load(f)
+len(data_loader) # 193934
+print('data loaded')
 
-tokenized_sent, token_ids = ner.tokenizer(text)
-preds = ner.inference(token_ids)
-result = ner.post_process(tokenized_sent, preds)
+### inference
+list_preds = []
+with torch.no_grad():
+    for batch_token_sent, batch_token_ids in tqdm(data_loader[args.start_idx:args.end_idx]):
+    # for batch_token_sent, batch_token_ids in tqdm(data_loader[args.start_idx:args.start_idx + 10]):
+        preds = ner.inference(batch_token_ids.to(device))
+        list_preds.append(preds)
 
-result
+with open(os.path.join(PATH_ROOT, f'news_2020_2021_preds_{args.gpu_id}.pickle'), 'wb') as f:
+    pickle.dump(list_preds, f)
