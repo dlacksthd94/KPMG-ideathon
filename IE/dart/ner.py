@@ -28,26 +28,30 @@ print(data_list[0])
 # 섹션별로 내용 분리하는 함수
 
 def extract_section(path, encoding, section):
-  document = []
   chapter = []
   flag = False
-  section_template = f'AASSOCNOTE="\w-0-{section}-\w-\w+"'
+  section_template_start = f'AASSOCNOTE="\w-0-{section}-\w-\w+"'
+  section_template_end = f'AASSOCNOTE="\w-0-{section+1}-\w-\w+"'
 
   with open(path,'r', encoding=f'{encoding}') as fp:
 
     while True:
       line = fp.readline()
+      # print(line)
       
       if not line:
+        pass
+
+      if re.search(section_template_start, line):
+        flag = True 
+      elif re.search(section_template_end, line):
+        flag = False
         break
 
-      if re.search(section_template, line):
-        document.append('\n'.join(chapter))
-        chapter = []
+      if flag:
+        chapter.append(line)
 
-      chapter.append(line)
-
-  return document
+  return chapter
 
 ner = Pororo(task="ner", lang="ko")
 srl = Pororo(task="srl", lang="ko")
