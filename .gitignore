@@ -1,4 +1,11 @@
 # folder
 data
+QaNER
 
 # file
+sandbox.py
+setup_env_*
+requirements_*
+kogpt*
+dart_fss*
+chatgpt*

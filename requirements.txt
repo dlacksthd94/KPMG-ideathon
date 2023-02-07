@@ -5,3 +5,4 @@ pandas
 bs4
 lxml
 html_table_parser
+black

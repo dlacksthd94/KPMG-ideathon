@@ -130,7 +130,7 @@ class MyFastPororo():
         preds = (self.model.predict(
             "sequence_tagging_head",
             inputs,
-        )[0, 1:-1, :].argmax(dim=1).cpu().numpy())
+        )[:, 1:-1, :].argmax(dim=2).cpu().numpy())
 
         return preds
 
