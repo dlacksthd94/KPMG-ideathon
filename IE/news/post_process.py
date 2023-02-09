@@ -1,37 +1,81 @@
 from models import MyFastPororo
 import os
-import json
 from tqdm import tqdm
 import pickle
-import joblib as jl
-import torch
-import argparse
+from itertools import chain
 PATH_ROOT = '/home/cslim/KPMG/data/news'
 
 ner = MyFastPororo()
+ner.load_model()
 
-for gpu_id in range(4):
+with open(os.path.join(PATH_ROOT, f'news_2020_2021_data.pickle'), 'rb') as f:
+    list_data = pickle.load(f)
+
+# with open(os.path.join(PATH_ROOT, f'news_2020_2021_token_sent.pickle'), 'rb') as f:
+#     list_token_sent = pickle.load(f)
+# len(list_token_sent) # 24823444
+
+with open(os.path.join(PATH_ROOT, f'news_2020_2021_token_ids.pickle'), 'rb') as f:
+    list_token_ids = pickle.load(f)
+    
+with open(os.path.join(PATH_ROOT, f'news_2020_2021_batch.pickle'), 'rb') as f:
+    list_batch = pickle.load(f)
+
+list_result = []
+for gpu_id in tqdm(range(4)):
     with open(os.path.join(PATH_ROOT, f'news_2020_2021_preds_{gpu_id}.pickle'), 'rb') as f:
         list_preds = pickle.load(f)
+    
+    # start_idx = gpu_id * 10000
+    # for (token_sent_batch, token_ids_batch), pred_batch in tqdm(zip(list_batch[start_idx:], list_preds), total=len(list_preds)):
+    #     for list_token_sent, list_pred in zip(token_sent_batch, pred_batch):
+    #         list_token_sent = list_token_sent.split('<sep>')
+    #         list_token_sent_len = list(map(lambda x: len(x.split()), list_token_sent))
+    #         list_pred = list_pred[1:1 + sum(list_token_sent_len)]
+    #         start_idx = 0
+    #         for i, token_sent in enumerate(list_token_sent):
+    #             token_sent_len = list_token_sent_len[i]
+    #             pred = list_pred[start_idx:start_idx + token_sent_len]
+    #             pred = np.concatenate([[0], pred, [0]])
+    #             start_idx = token_sent_len
+    #             list_result = ner.post_process(token_sent, pred)
+    #             list_result
+    #         # list_ne = list(filter(lambda x: True if x[1] != 'O' else False, list_result))
+    
+    start_idx = gpu_id * 100000
+    for (token_sent_batch, token_ids_batch), pred_batch in tqdm(zip(list_batch[start_idx:], list_preds), total=len(list_preds)):
+        for token_sent, pred in zip(token_sent_batch, pred_batch):
+            result = ner.post_process(token_sent, pred)
+            list_result.append(result)
 
-    ### post-process
-    list_ner = []
-    for news_year in tqdm(dataset):
-        list_ner_year = []
-        for group in tqdm(news_year, leave=False):
-            list_ner_group = []
-            for doc in tqdm(group, leave=False):
-                list_ner_doc = []
-                for para in doc:
-                    try:
-                        tokenized_sent, token_ids = ner.tokenizer(para)
-                        preds = ner.inference(token_ids)
-                        for pred in preds:
-                            ner_para = ner.post_process(tokenized_sent, pred)
-                        list_ner_doc.append(ner_para)
-                    except:
-                        ner_para = []
-                list_ner_group.append(list_ner_doc)
-            list_ner_year.append(list_ner_group)
-        list_ner.append(list_ner_year)
-    len(list_ner)
+assert len(list_result) == 24823444
+
+with open(os.path.join(PATH_ROOT, 'news_2020_2021_result.pickle'), 'wb') as f:
+    pickle.dump(list_result, f)
+
+with open(os.path.join(PATH_ROOT, 'news_2020_2021_result.pickle'), 'rb') as f:
+    list_result = pickle.load(f)
+
+assert len(list_result) == len(list(chain.from_iterable(chain.from_iterable(chain.from_iterable(list_data)))))
+
+i = 0
+list_result_aligned = []
+for year in tqdm(list_data):
+    list_year = []
+    for group in tqdm(year, leave=False):
+        list_group = []
+        for doc in tqdm(group, leave=False):
+            num_sent = len(doc)
+            list_sent = list_result[i:i + num_sent]
+            i += num_sent
+            list_group.append(list_sent)
+        list_year.append(list_group)
+    list_result_aligned.append(list_year)
+assert i == len(list_result)
+
+with open(os.path.join(PATH_ROOT, 'news_2020_2021_result_aligned.pickle'), 'wb') as f:
+    pickle.dump(list_result_aligned, f)
+
+with open(os.path.join(PATH_ROOT, 'news_2020_2021_result_aligned.pickle'), 'rb') as f:    
+    list_result_aligned = pickle.load(f)
+len(list_result_aligned)

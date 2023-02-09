@@ -23,7 +23,7 @@ print('model loaded')
 
 with open(os.path.join(PATH_ROOT, 'news_2020_2021_batch.pickle'), 'rb') as f:
     data_loader = pickle.load(f)
-len(data_loader) # 193934
+len(data_loader) # 193934 / 41823
 print('data loaded')
 
 ### inference
@@ -31,7 +31,7 @@ list_preds = []
 with torch.no_grad():
     for batch_token_sent, batch_token_ids in tqdm(data_loader[args.start_idx:args.end_idx]):
     # for batch_token_sent, batch_token_ids in tqdm(data_loader[args.start_idx:args.start_idx + 10]):
-        preds = ner.inference(batch_token_ids.to(device))
+        preds = ner.inference(batch_token_ids)
         list_preds.append(preds)
 
 with open(os.path.join(PATH_ROOT, f'news_2020_2021_preds_{args.gpu_id}.pickle'), 'wb') as f:
