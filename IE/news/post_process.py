@@ -79,3 +79,5 @@ with open(os.path.join(PATH_ROOT, 'news_2020_2021_result_aligned.pickle'), 'wb')
 with open(os.path.join(PATH_ROOT, 'news_2020_2021_result_aligned.pickle'), 'rb') as f:    
     list_result_aligned = pickle.load(f)
 len(list_result_aligned)
+
+list_result_aligned[0][0][0]
