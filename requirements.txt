@@ -8,3 +8,5 @@ html_table_parser
 black
 openai
 tenacity
+pyvis
+matplotlib

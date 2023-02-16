@@ -3,6 +3,7 @@ import os
 from tqdm import tqdm
 import pickle
 from itertools import chain
+import json
 PATH_ROOT = '/home/cslim/KPMG/data/news'
 
 ner = MyFastPororo()
@@ -73,11 +74,42 @@ for year in tqdm(list_data):
     list_result_aligned.append(list_year)
 assert i == len(list_result)
 
-with open(os.path.join(PATH_ROOT, 'news_2020_2021_result_aligned.pickle'), 'wb') as f:
-    pickle.dump(list_result_aligned, f)
+if 'list_result_aligned' in locals():
+    with open(os.path.join(PATH_ROOT, 'news_2020_2021_result_aligned.pickle'), 'wb') as f:
+        pickle.dump(list_result_aligned, f)
 
 with open(os.path.join(PATH_ROOT, 'news_2020_2021_result_aligned.pickle'), 'rb') as f:    
     list_result_aligned = pickle.load(f)
 len(list_result_aligned)
 
-list_result_aligned[0][0][0]
+### align original data with ne result
+list_doc_ner = list(chain.from_iterable(chain.from_iterable(list_result_aligned))) # 1707622
+list_doc = list(chain.from_iterable(chain.from_iterable(list_data))) # 1707622
+
+i = 0
+dict_final = {}
+list_dir_name = ['NIKL_NEWSPAPER_2021_v1.0/', 'NIKLNEWSPAPER_2022_v1.0/']
+for dir_name in tqdm(list_dir_name):
+    PATH_DIR = os.path.join(PATH_ROOT, dir_name)
+    list_fine_name = os.listdir(PATH_DIR)
+    list_result_group = []
+    for file_name in tqdm(list_fine_name, leave=False):
+        if file_name.endswith('pdf'):
+            continue
+        PATH_FILE = os.path.join(PATH_DIR, file_name)
+        with open(PATH_FILE, "r") as f:
+            news_json = json.load(f)
+        list_doc_temp = news_json['document']
+        for doc in tqdm(list_doc_temp, leave=False):
+            doc['paragraph'] = list_doc[i]
+            doc['ner'] = [list(set([ne_pair for ne_pair in ne_sent if ne_pair[1] != 'O'])) for ne_sent in list_doc_ner[i]]
+            new_id = doc.pop('id')
+            dict_final[new_id] = doc
+            i += 1
+
+len(dict_final) # 1707622
+dict_final[list(dict_final.keys())[-1]]
+
+if 'dict_final' in locals():
+    with open(os.path.join(PATH_ROOT, f'news_2020_2021_final.pickle'), 'wb') as f:
+        pickle.dump(dict_final, f)
