@@ -44,6 +44,8 @@ class MyFastPororo():
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.ckpt_dir = None
         self.model = None
+        
+        self.load_model()
 
     def download_model(self):
         url = 'https://twg.kakaocdn.net/pororo/ko/models/bert/charbert.base.ko.ner.zip'
