@@ -5,8 +5,8 @@ from itertools import chain
 from tqdm import tqdm
 import copy
 from collections import Counter
-
 PATH_ROOT = '/home/cslim/KPMG/data/'
+
 with open(os.path.join(PATH_ROOT, 'html_EV.pickle'), 'rb') as f:
     dart_ner = pickle.load(f)
 

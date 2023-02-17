@@ -10,3 +10,5 @@ openai
 tenacity
 pyvis
 matplotlib
+selenium
+newspaper3k
