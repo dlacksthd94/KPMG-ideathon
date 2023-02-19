@@ -36,10 +36,20 @@ Before using NewsNet, make sure you have the following software installed on you
 
 ```bash setup_env.sh```
 
-### Usage
-1. Launch the NewsNet application:
+### Details
+1. IE/
 
-```python main_page.py```
+Functions to process Dart / News data
+
+2. KG/
+
+Functions to use processed data from IE to create Knowledge Graph
+
+Helper functions
+
+3. app/
+
+Interactive and intuitive application displaying NewsNet
 
 ### Credits
 [Pororo](https://github.com/kakaobrain/pororo) for information extraction and summarization
