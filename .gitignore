@@ -10,7 +10,11 @@ requirements_*
 kogpt*
 dart_fss*
 chatgpt*
-*.png
+clustering_inertia.png
+hist_news_embedding.png
+ex1.png
+ex2.png
+app_prototype.py
 inference.py
 load_data.py
 post_process.py

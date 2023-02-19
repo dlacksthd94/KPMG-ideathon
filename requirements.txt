@@ -12,3 +12,5 @@ pyvis
 matplotlib
 selenium
 newspaper3k
+dash
+dash_bootstrap_components
