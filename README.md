@@ -6,6 +6,8 @@ This repository contains the code and resources for our submission to the KPMG I
 
 Our tool addresses this problem by allowing users to input a keyword or phrase, which the tool uses to **collect** relevant news articles and industry reports from a variety of sources. The tool then uses name entity recognition (NER) to **extract** relevant information, such as key concepts, entities, and relationships, from the articles. This information is then **integrated** into a knowledge graph, which provides users with a visual representation of the key concepts and relationships between them.
 
+![screenshot](./screenshot.png)
+
 The knowledge graph allows users to explore the information in a more intuitive way, enabling them to quickly identify patterns and connections that may not have been immediately obvious from the original articles. In addition, the tool provides several other features to enhance the user experience:
 
 - Article Clustering: The tool clusters and drops relevant or duplicated articles.
