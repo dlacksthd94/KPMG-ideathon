@@ -37,7 +37,7 @@ Before using NewsNet, make sure you have the following software installed on you
 ### Usage
 1. Launch the NewsNet application:
 
-```python main.page.py```
+```python main_page.py```
 
 ### Credits
 [Pororo](https://github.com/kakaobrain/pororo) for information extraction and summarization
