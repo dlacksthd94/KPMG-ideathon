@@ -47,7 +47,7 @@ Functions to use processed data from IE to create Knowledge Graph
 
 Helper functions
 
-3. [app/](https://github.com/dlacksthd94/KPMG-ideathon/blob/main/app/README.md)
+3. [app/](https://github.com/dlacksthd94/KPMG-ideathon/tree/main/app)
 
 Interactive and intuitive application displaying NewsNet
 
