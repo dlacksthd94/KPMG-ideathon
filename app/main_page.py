@@ -22,7 +22,7 @@ app = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 G_loaded = nx.read_gml(path='/home/kic/KPMG-ideathon/KG/dart_graph')
 
 ### 기업 정보 파트 ###
-path = '/home/kic/data'
+path = './data'
 pickle_file_1 = f'{path}/dart_processed/summ_EV.pickle'
 pickle_file_2 = f'{path}/dart_processed/html_EV.pickle'
 # Dart Summarization data
@@ -96,7 +96,7 @@ app.layout = dbc.Container([
             # Header image
             dbc.Row(
                 html.Img(src='https://github.com/dlacksthd94/KPMG-ideathon/blob/main/app/header.png?raw=true',
-                    style={'height':'20%', 'width':'20%', 'margin':'-10px 0px 30px 0px'}),
+                    style={'padding': '10px', 'height':'20%', 'width':'20%', 'margin':'-10px 0px 30px 0px'}),
             ),
             
             
