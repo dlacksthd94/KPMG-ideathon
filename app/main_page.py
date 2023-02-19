@@ -7,21 +7,19 @@ import plotly.express as px
 import pandas as pd
 import base64
 import pickle
-from graph import get_plotly_graph, filtering_dart_graph, processing_keywords
-from news import get_articles, get_accodion_items
+from graph import get_plotly_graph 
+from news_copy import get_articles, get_accodion_items
 import json
 import requests
 from bs4 import BeautifulSoup as bs
 import networkx as nx
 import time
+from datetime import date, datetime
+from info import get_info, filtering_dart_graph
 
 # app = Dash(__name__)
 app = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 G_loaded = nx.read_gml(path='/home/kic/KPMG-ideathon/KG/dart_graph')
-
-
-### 연관 기사 파트 ### 
-
 
 ### 기업 정보 파트 ###
 path = '/home/kic/data'
@@ -70,25 +68,22 @@ def getMarks(start, end, Nth=14):
             result[unixTimeMillis(date)] = str(date.strftime('%Y-%m-%d'))
     return result
 
-range_slider = dcc.RangeSlider(
-                id='year_slider',
-                min = unixTimeMillis(daterange.min()),
-                max = unixTimeMillis(daterange.max()),
-                value = [unixTimeMillis(daterange.min()),
-                         unixTimeMillis(daterange.max())],
-                marks=getMarks(daterange.min(),
-                            daterange.max()),
-            )
+range_slider = dcc.DatePickerRange(
+                    id='year_slider',
+                    start_date_placeholder_text="Start Period",
+                    end_date_placeholder_text="End Period",
+                    clearable=True,
+                    min_date_allowed=min_date,
+                    max_date_allowed=max_date,
+                    start_date=min_date,
+                    end_date=max_date,
+                    # start_date=unixTimeMillis(daterange.min()),
+                    # end_date=unixTimeMillis(daterange.max()),
+                    style={'width':'100%', 'height':'25px', 'font-size':'20%',  
+                    'margin':'10 0 0 10px', 'border-radious':'30px'}
+                )
 
-# txt = docs[name[61]]['summ'][0].replace('1. 사업의 개요 ', '')
-# ner_1 = ners[name[61]]['ner'][1]
-# ner_2 = ners[name[61]]['ner'][2]
 
-# base_url = 'https://dart.fss.or.kr'
-# url = f'{base_url}/navi/searchNavi.do?naviCrpCik={name[61]}&naviCode=A002'
-# response = requests.get(url=url)
-# soup = bs(response.text, "html.parser")
-# new_url = f"{base_url}{soup.find('iframe')['src']}"
 
 
 ### 앱 레이아웃 ### 
@@ -97,17 +92,46 @@ app.layout = dbc.Container([
     # Header
     html.Div(
         children=[
-            html.Img(src='https://github.com/dlacksthd94/KPMG-ideathon/blob/main/app/header.png?raw=true',
-                    style={'height':'40%', 'width':'40%', 'margin':30}),
-            html.Div(
-                children = [
-                    html.Div(id='year_filter_text', style={'text-align': 'center'}),
-                    range_slider
-                ],
-                style={'height':'5%', 'width':'40%', 'margin':30, 'font-size':'80%'}
-           ),
+            # Header image
+            dbc.Row(
+                html.Img(src='https://github.com/dlacksthd94/KPMG-ideathon/blob/main/app/header.png?raw=true',
+                    style={'height':'20%', 'width':'20%', 'margin':'-10px 0px 30px 0px'}),
+            ),
+            
+            
+            dbc.Row([
+                # input box
+                dbc.Col(
+                    dcc.Input(
+                        placeholder=' 뉴스 키워드를 입력하세요...',
+                        type='text',
+                        value='',
+                        style={'width':'100%', 'height':'48px', 'margin':'', 'border-radius': '5px', 'outline':'dark'}
+                    ),
+                    width=6
+                ),
+                # 날짜 필터
+                dbc.Col(
+                    children = [
+                        # html.Div(id='year_filter_text', style={'text-align': 'center', 'margin':10}),
+                        range_slider
+                    ],
+                    width=3
+                ),
+                # 검색 버튼
+                dbc.Col(
+                    html.Button(
+                        '검색', 
+                        id='search-button', 
+                        style={'margin':'0px 0px 0px 0px', 'width':'100px', 'height':'48px', 'align':'center'},
+                    ),
+                    width=1
+                ),  
+                ], justify='center'
+            ),
 
-        ]
+        ],
+        style={'margin':30}
     ),
     
 
@@ -115,7 +139,7 @@ app.layout = dbc.Container([
         children=[
             # Col 1 (연관 기사)
             html.Div(
-                style={'width':'28%', 'height':'120%','float':'left', 'margin':0, 'overflow':'scroll', "maxHeight": "420px"},
+                style={'width':'28%', 'height':'120%','float':'left', 'margin':'10px 0 0 0px', 'overflow':'scroll', "maxHeight": "420px"},
 
                 children=[],
                 id = 'accodion'
@@ -124,7 +148,7 @@ app.layout = dbc.Container([
 
             # Col 2 (지식 그래프)
             html.Div(
-                style={'width':'39%', 'height':'150%','float':'left', 'margin':5},
+                style={'width':'39%', 'height':'150%','float':'left', 'margin':'-10px 0 0 0px'},
                 children=[
                     # html.P('지식 그래프'),
                     dcc.Graph(
@@ -137,7 +161,7 @@ app.layout = dbc.Container([
 
             # Col 3 (기업 정보 요약)
             html.Div(
-                style={'width':'30%', 'height':'100%','float':'left', 'margin':'0 0 0 30px'},
+                style={'width':'30%', 'height':'100%','float':'left', 'margin':'24px 0 0 30px'},
                 children=[
                     html.Div(
                         children=[
@@ -145,44 +169,12 @@ app.layout = dbc.Container([
                                 children='관심 있는 노드를 클릭해보세요.', 
                                 id='company_name'
                             ),
-                            # html.Br(),
-                            
+                            html.Div(id='company_view', style={'margin':'0 20 0 10px', 'font-size':'90%'}),
                             html.Div(
-                                children=[
-                                    html.H6("사업 개요"),
-                                    html.Div(id='company_view'),
-
-                                    html.Div(
-                                        children=[
-                                            dbc.Button(
-                                                # "출처: 금융감독원 전자공시시스템", 
-                                                "사업보고서 원문",
-                                                id="open-offcanvas", 
-                                                n_clicks=0, 
-                                                size='sm',
-                                                color='dark',
-                                                outline=True,
-                                                style={'width':'25%', 'height':'50%', 'font-size':'70%'}
-                                            ),
-                                            dbc.Offcanvas(
-                                                id="offcanvas",
-                                                placement="end",
-                                                is_open=False,
-                                                style={'width':'50%'},
-                                                children=[
-                                                    dbc.Spinner(
-                                                        children=[
-                                                            html.Iframe(id="iframe", src="about:blank", style={"width": "100%", "height": "calc(100vh - 50px)"})
-                                                        ], 
-                                                        type="grow"
-                                                    ),
-                                                ],
-                                            )
-                                        ],
-                                        style={'textAlign':'right', 'font-size': '90%'}
-                                    ),   
-                                ]
-                            ),
+                                children=[],
+                                style={'font-size': '90%'},
+                                id='dart_link'
+                            ),   
                             html.Br(),  
                             html.Div(
                                 children=html.H6(
@@ -209,7 +201,8 @@ def display_selected_data(selectedData):
 def dart_company_view(c_code):
     # print(docs[c_code])
     txt = docs[c_code]['summ'][0].replace('1. 사업의 개요 ', '')
-    return html.Div(children=txt)
+    # return html.Div(children=txt)
+    return html.Div(children=[html.H6("사업 개요"), txt])
 
 @app.callback(
     Output('company_name', 'children'),
@@ -243,7 +236,7 @@ def display_selected_data(selectedData):
     keywords = filtering_dart_graph(G_loaded, corp_name)
     childrens = [
         html.H6(f"{corp_name} 관련 기업 및 제품 키워드"),
-        html.P(", ".join(keywords['주요제품1']+keywords['관계사']), style={'font-size':'80%'}),
+        html.P(", ".join(keywords['주요제품1']+keywords['관계사']+keywords['원재료']), style={'font-size':'80%'}),
     ]
     return childrens
 
@@ -261,26 +254,50 @@ def open_offcanvas(n_clicks):
     return False, "about:blank"
 
 @app.callback(
-    Output('year_filter_text', 'children'),
+    Output('dart_link', 'children'),
+    Input('graph1', 'selectedData'),
+    prevent_initial_call=True
+)
+def display_selected_data(selectedData):
+    return get_info()
+
+@app.callback(
+    # Output('year_filter_text', 'children'),
     Output('graph1', 'figure'),
-    [Input('year_slider', 'value')])
-def _update_time_range_label(year_range):
-    start_date = unixToDatetime(year_range[0])
-    end_date = unixToDatetime(year_range[1])
+    Input('year_slider', 'start_date'),
+    Input('year_slider', 'end_date'))
+
+    # [Input('year_slider', 'value')]
+    # [Input('year_slider', 'start_date'), 
+    # Input('year_slider', 'end_date')])
+# def _update_time_range_label(year_range):
+def _update_time_range_label(start_date, end_date):
+    if start_date is None:
+        start_date = min_date
+
+    if end_date is None:
+        end_date = max_date
+
     new_df = df_cs[(df_cs['date'] >= start_date) & (df_cs['date'] <= end_date)]
     filter_text_string = '날짜 필터: {} 부터 {} 까지'.format( start_date, end_date )
     fig = get_plotly_graph(new_df)
-    return filter_text_string, fig
+    return fig
 
 @app.callback(
     Output('accodion', 'children'),
-    [Input('year_slider', 'value')])
-def _update_time_range_label(year_range):
-    start_date = unixToDatetime(year_range[0])
-    end_date = unixToDatetime(year_range[1])
+    # [Input('year_slider', 'value')]
+    Input('year_slider', 'start_date'),
+    Input('year_slider', 'end_date') )
+# def _update_time_range_label(year_range):
+def _update_time_range_label(start_date, end_date):
+    if start_date is None:
+        start_date = min_date
+
+    if end_date is None:
+        end_date = max_date    
     new_df = df_cs[(df_cs['date'] >= start_date) & (df_cs['date'] <= end_date)]  
     return get_accodion_items(new_df)
 
 if __name__ == '__main__':
     # app.run_server(debug=True)
-    app.run_server(debug=False, host='localhost', port=8050, use_reloader=True)
+    app.run_server(debug=False, host='localhost', port=8080, use_reloader=True)

@@ -30,9 +30,10 @@ def get_top_n_nodes(n, nodes, edges):
 
     return result_nodes, result_edges
 
-def retrieve_news_graph():
+def retrieve_news_graph(df_cs):
     global nodes_info
-    df_cs = pd.read_pickle('~/data/df_news_final.pickle')
+    if df_cs is None:
+        df_cs = pd.read_pickle('~/data/df_news_final.pickle')
     result = []
     nodes = dict()
     edges = dict()
@@ -143,8 +144,8 @@ def retrieve_dart_graph():
 
     return g
 
-def get_plotly_graph():
-    G, node_size, color_map, edge_width = retrieve_news_graph()
+def get_plotly_graph(df=None):
+    G, node_size, color_map, edge_width = retrieve_news_graph(df)
     pos = nx.spring_layout(G)
 
     edge_x = []
@@ -225,23 +226,3 @@ def get_plotly_graph():
 
     return fig
 
-
-
-G_loaded = nx.read_gml(path='/home/kic/KPMG-ideathon/KG/dart_graph')
-global G_loaded
-
-def filtering_dart_graph(corp_name, distance=3):
-    keywords = {'주요제품1':[], '사업장':[], '관계사':[], '원재료':[], '관련이슈':[]}
-    stack = deque([corp_name])
-
-    for i in range(distance):
-        while stack:
-            node = stack.popleft()
-            neighbors = list(G_loaded[node])
-            for n in neighbors:
-                keywords[G_loaded[node][n]['kind']].append(n)
-
-        stack += neighbors 
-    
-
-    return keywords['주요제품1'] + keywords['관계사'] + keywords['원재료']
