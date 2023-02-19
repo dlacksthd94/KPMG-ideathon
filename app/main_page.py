@@ -8,7 +8,7 @@ import pandas as pd
 import base64
 import pickle
 from graph import get_plotly_graph 
-from news_copy import get_articles, get_accodion_items
+from news import get_articles, get_accodion_items
 import json
 import requests
 from bs4 import BeautifulSoup as bs
