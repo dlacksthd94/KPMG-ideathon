@@ -22,7 +22,7 @@ app = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 G_loaded = nx.read_gml(path='/home/kic/KPMG-ideathon/KG/dart_graph')
 
 ### 기업 정보 파트 ###
-path = './data'
+path = '../data'
 pickle_file_1 = f'{path}/dart_processed/summ_EV.pickle'
 pickle_file_2 = f'{path}/dart_processed/html_EV.pickle'
 # Dart Summarization data
