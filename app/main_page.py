@@ -36,7 +36,8 @@ name = EV.corp_code
 
 
 ## News 읽기
-df_cs = pd.read_pickle('~/data/df_news_final.pickle')
+# df_cs = pd.read_pickle('~/data/df_news_final.pickle')
+df_cs = pd.read_pickle(f'{path}/df_news_final.pickle')
 df_cs['date'] = pd.to_datetime(df_cs['date'])
 
 titles, contents, dates, urls = get_articles(df_cs)
