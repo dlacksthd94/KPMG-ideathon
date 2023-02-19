@@ -9,7 +9,7 @@ conda env remove -n kpmg
 conda env list
 
 # create env
-conda create -n kpmg python=3.7 -y
+conda create -n kpmg python=3.8 -y
 conda env list
 
 # activate env

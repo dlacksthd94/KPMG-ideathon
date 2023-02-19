@@ -1,13 +1,9 @@
 pororo
-spacy
-streamlit
 pandas
 bs4
 lxml
 html_table_parser
 black
-openai
-tenacity
 pyvis
 matplotlib
 selenium

@@ -30,9 +30,9 @@ Before using NewsNet, make sure you have the following software installed on you
 
 ```git clone https://github.com/dlacksthd94/KPMG-ideathon.git```
 
-2. Install the required Python packages:
+2. Create a conda enviroment and install the required Python packages:
 
-```pip install -r requirements.txt```
+```bash setup_env.sh```
 
 ### Usage
 1. Launch the NewsNet application:
