@@ -2,6 +2,8 @@
 data
 QaNER
 KG
+__pycache__
+.ipynb_checkpoints
 
 # file
 sandbox.py

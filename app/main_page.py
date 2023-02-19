@@ -243,11 +243,7 @@ def display_selected_data(selectedData):
     keywords = filtering_dart_graph(G_loaded, corp_name)
     childrens = [
         html.H6(f"{corp_name} 관련 기업 및 제품 키워드"),
-        html.P(", ".join(keywords['주요제품1']), style={'font-size':'80%'}),
-        # html.H6(f"{corp_name} 관련 기업"),
-        # html.P(", ".join(keywords['관계사']), style={'font-size':'80%'}),
-        # html.H6(f"{corp_name} 관련 원자재"),
-        # html.P(", ".join(keywords['원재료']), style={'font-size':'80%'}),
+        html.P(", ".join(keywords['주요제품1']+keywords['관계사']), style={'font-size':'80%'}),
     ]
     return childrens
 
