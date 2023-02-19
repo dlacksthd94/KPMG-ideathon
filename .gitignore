@@ -1,6 +1,7 @@
 # folder
 data
 QaNER
+KG
 
 # file
 sandbox.py
@@ -14,6 +15,3 @@ inference.py
 load_data.py
 post_process.py
 run.sh
-Louvain.py
-filter_news_ne.py
-get_doc_embedding.py
