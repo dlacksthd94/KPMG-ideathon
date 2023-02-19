@@ -19,3 +19,5 @@ inference.py
 load_data.py
 post_process.py
 run.sh
+open_page.py
+dash_test.py
